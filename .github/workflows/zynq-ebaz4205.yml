@@ -3,21 +3,7 @@ name: zynq-ebaz4205
 on:
   workflow_dispatch:
   
-# on:
-# release:
-#   types: published
-# push:
-#   branches:
-#     - master
-#   paths:
-#     - 'Lean'
-#   schedule:
-#     - cron: 0 18 * * *
-#   watch:
-#     types: started
-  
 env:
-
   CONFIG_FILE: zynq-ebaz4205-lite.config
   DIY_SH: zynq-ebaz4205-lite.sh
   SSH_ACTIONS:  true
@@ -45,25 +31,27 @@ jobs:
     - name: 导入第三方包，更新feed
       run: |
         #### add luci-app-ssr-plus #### 
-        
         git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
         svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
         svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
-        for i in "dns2socks" "microsocks" "ipt2socks" "pdnsd-alt" "redsocks2"; do \
-        svn checkout "https://github.com/immortalwrt/packages/trunk/net/$i" "package/helloworld/$i"; \
+        for i in "dns2socks" "microsocks" "ipt2socks" "pdnsd-alt" "redsocks2"; do 
+        svn checkout "https://github.com/immortalwrt/packages/trunk/net/$i" "package/helloworld/$i"; 
         done
         # 使用sed插入特定行，在未来可能会出现问题
         sed -i '23a\tools-y += ucl upx' tools/Makefile
         sed -i '41a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
         
-        #### end luci-app-ssr-plus #### 
-        
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         
-    - name: SSH连接，手动 make menuconfig
-      uses: sypopo/debugger-action@master
-      if: env.SSH_ACTIONS == 'true'
+    #- name: SSH连接，手动 make menuconfig
+    #  uses: sypopo/debugger-action@master
+    #  if: env.SSH_ACTIONS == 'true'
+    
+    - name: 配置config
+      run: |
+        git clone https://github.com/Elrori/openwrt-auto.git 
+        cp openwrt-auto/config/$CONFIG_FILE .config
         
     - name: 下载软件包
       id: package
@@ -75,16 +63,7 @@ jobs:
       id: compile
       run: |
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) V=s
-        echo "===========df============"
-        df -h
-        echo "========================="
-        du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
-        echo "========================="
-        du -h --max-depth=1 ./build_dir
-        echo "========================="
-        du -h --max-depth=1 ./bin
-        echo "========================="
+        make -j$(nproc) V=sc
 
     - name: 准备打包
       if: env.LATEST_VERSION == 0
