@@ -6,6 +6,7 @@ on:
 env:
   CONFIG_FILE: zynq-zed-lite.config
   DEVICE_NAME: zynq-zed
+  TARGET_NAME: zynq
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
 
