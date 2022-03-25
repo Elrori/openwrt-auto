@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   
 env:
-  CONFIG_FILE: zynq-ebaz4205-lite.config
-  DIY_SH: zynq-ebaz4205-lite.sh
+  CONFIG_FILE: zynq-zed-lite.config
+  DEVICE_NAME: zynq-zed
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
 
@@ -18,7 +18,14 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: 'openwrt/openwrt'
-      
+        
+    - name: Get Kernel version
+      shell: bash {0}
+      run: |
+        KERNEL_VERSION=$(cat target/linux/${{ env.TARGET_NAME }}/Makefile | grep KERNEL_PATCHVER | sed -r 's|.*([0-9]+.[0-9]+)$|\1|')
+        LINUX_VERSION=$(cat include/kernel-$KERNEL_VERSION | grep LINUX_VERSION-$KERNEL_VERSION | sed -r 's|.*(\.[0-9]+)$|\1|')
+        echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV
+          
     - name: 初始环境
       run: |
           sudo apt update
@@ -81,8 +88,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: test
-        release_name: Release v0
+        tag_name: v${{ env.KERNEL_VERSION }}-${{ env.DEVICE_NAME }}
+        release_name: Release v${{ env.KERNEL_VERSION }}-${{ env.DEVICE_NAME }}
         draft: false
         prerelease: false
         
