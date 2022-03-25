@@ -17,13 +17,10 @@ on:
 #     types: started
   
 env:
-  REPO_URL: https://github.com/openwrt/openwrt
-  REPO_BRANCH: master
+
   CONFIG_FILE: zynq-ebaz4205-lite.config
   DIY_SH: zynq-ebaz4205-lite.sh
   SSH_ACTIONS:  true
-  UPLOAD_BIN_DIR: true
-  UPLOAD_FIRMWARE: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -45,9 +42,10 @@ jobs:
           python3-distutils python3-setuptools rsync subversion swig time \
           xsltproc zlib1g-dev
 
-    - name: 导入第三方包
+    - name: 导入第三方包，更新feed
       run: |
         #### add luci-app-ssr-plus #### 
+        
         git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
         svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
         svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
@@ -58,7 +56,12 @@ jobs:
         sed -i '23a\tools-y += ucl upx' tools/Makefile
         sed -i '41a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
         
-    - name: SSH连接
+        #### end luci-app-ssr-plus #### 
+        
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+        
+    - name: SSH连接，手动 make menuconfig
       uses: sypopo/debugger-action@master
       if: env.SSH_ACTIONS == 'true'
         
