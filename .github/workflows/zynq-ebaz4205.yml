@@ -1,6 +1,9 @@
 name: zynq-ebaz4205
 
 on:
+  workflow_dispatch:
+  
+# on:
 # release:
 #   types: published
 # push:
@@ -26,35 +29,35 @@ env:
 jobs:
   build:
     runs-on: ubuntu-20.04
-    if: github.event.repository.owner.id == github.event.sender.id
-
     steps:
-    - name: Checkout
-      uses: actions/checkout@master
-
+    
+    - name: Checkout OpenWrt repository
+      uses: actions/checkout@v2
+      with:
+        repository: 'openwrt/openwrt'
+      
     - name: 初始环境
-      env:
-        DEBIAN_FRONTEND: noninteractive
       run: |
-          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-          sudo -E apt-get -qq update
-          sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 python2.7 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib antlr3 gperf wget curl swig rsync
-          sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
-          sudo -E apt-get -qq autoremove --purge
-          sudo -E apt-get -qq clean
+          sudo apt update
+          sudo apt install build-essential ccache ecj fastjar file g++ gawk \
+          gettext git java-propose-classpath libelf-dev libncurses5-dev \
+          libncursesw5-dev libssl-dev python python2.7-dev python3 unzip wget \
+          python3-distutils python3-setuptools rsync subversion swig time \
+          xsltproc zlib1g-dev
+
+    - name: 导入第三方包
+      run: |
+        #### add luci-app-ssr-plus #### 
+        git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
+        svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
+        svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
+        for i in "dns2socks" "microsocks" "ipt2socks" "pdnsd-alt" "redsocks2"; do \
+        svn checkout "https://github.com/immortalwrt/packages/trunk/net/$i" "package/helloworld/$i"; \
+        done
+        # 使用sed插入特定行，在未来可能会出现问题
+        sed -i '23a\tools-y += ucl upx' tools/Makefile
+        sed -i '41a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
         
-    - name: 下载源码
-      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt && cd openwrt && ./scripts/feeds clean && ./scripts/feeds update -a && ./scripts/feeds install -a
-   
-    - name: 导入自定义
-      run: |
-        git clone https://github.com/sypopo/diy ./openwrt/diy/sypopo
-        mv ./openwrt/diy/sypopo/$CONFIG_FILE $(pwd)
-        mv ./openwrt/diy/sypopo/$DIY_SH $(pwd)
-        df -h && pwd
-        [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        chmod +x $DIY_SH && cd openwrt && ../$DIY_SH
     - name: SSH连接
       uses: sypopo/debugger-action@master
       if: env.SSH_ACTIONS == 'true'
@@ -62,47 +65,49 @@ jobs:
     - name: 下载软件包
       id: package
       run: |
-        cd openwrt && make defconfig && make download -j8
-        find dl -size -1024c -exec ls -l {} \;
-        find dl -size -1024c -exec rm -f {} \;
-        
+        make defconfig
+        make download -j$(nproc)
+
     - name: 固件编译
       id: compile
       run: |
-        cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 V=s
-        echo "::set-output name=status::success"
-        echo "======================="
-        echo "Space usage:"
-        echo "======================="
+        make -j$(nproc) V=s
+        echo "===========df============"
         df -h
-        echo "======================="
+        echo "========================="
         du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
+        echo "========================="
         du -h --max-depth=1 ./build_dir
+        echo "========================="
         du -h --max-depth=1 ./bin
-        cp -f .config ./bin/targets/*/*/
-        
-    - name: 上传bin
-      uses: actions/upload-artifact@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
-      with:
-        name: OpenWrt_bin-x86-Lean
-        path: openwrt/bin
+        echo "========================="
 
-    - name: 固件打包
-      id: organize
-      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
+    - name: 准备打包
+      if: env.LATEST_VERSION == 0
+      shell: bash {0}
       run: |
-        cp openwrt/.config  openwrt/bin/targets/x86/64/config.txt
-        tar -czf bin.tar.gz openwrt/bin && cp -vf bin.tar.gz openwrt/bin/targets/x86/64
-        cd openwrt/bin/targets/*/*
-        rm -rf packages *rootfs* *vmlinuz *info *fest
-        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        echo "::set-output name=status::success"
-    - name: 上传固件
-      uses: actions/upload-artifact@master
-      if: steps.organize.outputs.status == 'success' && !cancelled()
+        mkdir artifacts
+        for file in bin/targets/*/*/*; do
+          sudo bash -c "sha512sum $file | sed -r 's|([0-9a-z]+).*|\1|g' > $file.sha512sum"
+          sudo mv $file* artifacts/
+        done
+
+    - name: 创建 release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: OpenWrt-x86-Lean
-        path: ${{ env.FIRMWARE }}
+        tag_name: test
+        release_name: Release v0
+        draft: false
+        prerelease: false
+        
+    - name: 上传 release
+      uses: NBTX/upload-release-assets@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        targets: artifacts/*
