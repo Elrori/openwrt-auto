@@ -70,7 +70,7 @@ jobs:
       shell: bash {0}
       run: |
         mkdir artifacts
-        for file in bin/targets/*/*/*; do
+        for file in bin/targets/*/*/*.gz; do
           sudo bash -c "sha512sum $file | sed -r 's|([0-9a-z]+).*|\1|g' > $file.sha512sum"
           sudo mv $file* artifacts/
         done
