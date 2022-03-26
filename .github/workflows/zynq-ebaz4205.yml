@@ -37,6 +37,7 @@ jobs:
         PATCHES_FILE=${{ env.PATCHES_FILE }}-$KERNEL_VERSION
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV   
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
+        echo "PATCHES_FILE=$PATCHES_FILE"
 
     - name: 添加 linux-5.10 u-boot-2019.7 EBAZ4205 补丁
       run: |
@@ -45,7 +46,8 @@ jobs:
         cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/${{ env.PATCHES_FILE }}/
         cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/111-u-boot-2019.07-ebaz4205-support.patch package/boot/uboot-zynq/patches/
         git apply openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/openwrt-ebaz4205.patch
-      
+        echo "target/linux/zynq/${{ env.PATCHES_FILE }}"
+
     - name: 导入第三方包，更新feed
       run: |
         #### add luci-app-ssr-plus #### 
