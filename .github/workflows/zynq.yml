@@ -4,8 +4,8 @@ on:
   workflow_dispatch:
   
 env:
-  CONFIG_FILE: zynq-zed-lite.config
-  DEVICE_NAME: zynq-zed
+  CONFIG_FILE: zynq-ebaz4205-lite.config
+  DEVICE_NAME: zynq-ebaz4205
   TARGET_NAME: zynq
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
@@ -14,19 +14,6 @@ jobs:
   build:
     runs-on: ubuntu-20.04
     steps:
-    
-    - name: Checkout OpenWrt repository
-      uses: actions/checkout@v2
-      with:
-        repository: 'openwrt/openwrt'
-        
-    - name: Get Kernel version
-      shell: bash {0}
-      run: |
-        KERNEL_VERSION=$(cat target/linux/${{ env.TARGET_NAME }}/Makefile | grep KERNEL_PATCHVER | sed -r 's|.*([0-9]+.[0-9]+)$|\1|')
-        LINUX_VERSION=$(cat include/kernel-$KERNEL_VERSION | grep LINUX_VERSION-$KERNEL_VERSION | sed -r 's|.*(\.[0-9]+)$|\1|')
-        echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV
-          
     - name: 初始环境
       run: |
           sudo apt update
@@ -35,7 +22,27 @@ jobs:
           libncursesw5-dev libssl-dev python python2.7-dev python3 unzip wget \
           python3-distutils python3-setuptools rsync subversion swig time \
           xsltproc zlib1g-dev
-
+          
+    - name: Get Kernel version
+      shell: bash {0}
+      run: |
+        KERNEL_VERSION=$(cat target/linux/${{ env.TARGET_NAME }}/Makefile | grep KERNEL_PATCHVER | sed -r 's|.*([0-9]+.[0-9]+)$|\1|')
+        LINUX_VERSION=$(cat include/kernel-$KERNEL_VERSION | grep LINUX_VERSION-$KERNEL_VERSION | sed -r 's|.*(\.[0-9]+)$|\1|')
+        echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV   
+        
+    - name: Checkout OpenWrt repository
+      uses: actions/checkout@v2
+      with:
+        repository: 'openwrt/openwrt'
+        
+    - name: 添加 linux-v5.10 u-boot-2019.7 EBAZ4205 补丁
+      run: |
+        git clone https://github.com/Elrori/openwrt-auto.git
+        mkdir target/linux/zynq/patch-v5.10
+        cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/patch-v5.10/
+        cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/111-u-boot-2019.07-ebaz4205-support.patch package/boot/uboot-zynq/patches/
+        git apply openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/openwrt-ebaz4205.patch
+      
     - name: 导入第三方包，更新feed
       run: |
         #### add luci-app-ssr-plus #### 
@@ -57,8 +64,7 @@ jobs:
     #  if: env.SSH_ACTIONS == 'true'
     
     - name: 配置config
-      run: |
-        git clone https://github.com/Elrori/openwrt-auto.git 
+      run: | 
         cp openwrt-auto/config/$CONFIG_FILE .config
         
     - name: 下载软件包
@@ -90,7 +96,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ env.KERNEL_VERSION }}-${{ env.DEVICE_NAME }}
-        release_name: Release v${{ env.KERNEL_VERSION }}-${{ env.DEVICE_NAME }}
+        release_name: Release v${{ env.KERNEL_VERSION }}-${{ env.DEVICE_NAME }}-${{ env.CONFIG_FILE }}
         draft: false
         prerelease: false
         
