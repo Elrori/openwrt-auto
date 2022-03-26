@@ -7,7 +7,6 @@ env:
   CONFIG_FILE: zynq-zed-lite.config
   DEVICE_NAME: zynq-ebaz4205
   TARGET_NAME: zynq
-  PATCHES_FILE: patches
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
 
@@ -83,6 +82,10 @@ jobs:
       run: |
         cp openwrt-auto/dts/zynq-ebaz4205.dts build_dir/target*/linux-zynq/linux*/arch/arm/boot/dts/
         make -j$(nproc) V=sc
+
+    - name: 制作镜像
+      run: |
+       cp openwrt-auto/bin/ 
 
     - name: 计算sha256,准备打包
       if: env.LATEST_VERSION == 0
