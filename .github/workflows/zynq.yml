@@ -31,6 +31,8 @@ jobs:
         LINUX_VERSION=$(cat include/kernel-$KERNEL_VERSION | grep LINUX_VERSION-$KERNEL_VERSION | sed -r 's|.*(\.[0-9]+)$|\1|')
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV   
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
+        env.PATCHES_FILE=${{ env.PATCHES_FILE }}-${{ KERNEL_VERSION }}
+        echo "PATCHES_FILE: ${{ env.PATCHES_FILE  }}"
 
     - name: Checkout OpenWrt repository
       uses: actions/checkout@v2
