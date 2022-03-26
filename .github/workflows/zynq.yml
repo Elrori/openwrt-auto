@@ -7,6 +7,7 @@ env:
   CONFIG_FILE: zynq-ebaz4205-lite.config
   DEVICE_NAME: zynq-ebaz4205
   TARGET_NAME: zynq
+  PATCHES_FILE: patches-5.10
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
 
@@ -35,10 +36,10 @@ jobs:
       with:
         repository: 'openwrt/openwrt'
         
-    - name: 添加 linux-v5.10 u-boot-2019.7 EBAZ4205 补丁
+    - name: 添加 linux-5.10 u-boot-2019.7 EBAZ4205 补丁
       run: |
         git clone https://github.com/Elrori/openwrt-auto.git
-        mkdir target/linux/zynq/patch-v5.10
+        mkdir target/linux/zynq/$(PATCHES_FILE)
         cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/patch-v5.10/
         cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/111-u-boot-2019.07-ebaz4205-support.patch package/boot/uboot-zynq/patches/
         git apply openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/openwrt-ebaz4205.patch
