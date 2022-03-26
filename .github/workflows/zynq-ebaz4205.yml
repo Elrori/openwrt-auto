@@ -32,7 +32,7 @@ jobs:
         env.PATCHES_FILE=${{ env.PATCHES_FILE }}-$KERNEL_VERSION
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV   
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
-        echo "PATCHES_FILE: ${{ env.PATCHES_FILE  }}"
+
 
     - name: Checkout OpenWrt repository
       uses: actions/checkout@v2
