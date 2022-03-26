@@ -23,6 +23,11 @@ jobs:
           libncursesw5-dev libssl-dev python python2.7-dev python3 unzip wget \
           python3-distutils python3-setuptools rsync subversion swig time \
           xsltproc zlib1g-dev
+
+    - name: Checkout OpenWrt repository
+      uses: actions/checkout@v2
+      with:
+        repository: 'openwrt/openwrt'
           
     - name: 获取内核版本
       shell: bash {0}
@@ -33,12 +38,6 @@ jobs:
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV   
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
 
-
-    - name: Checkout OpenWrt repository
-      uses: actions/checkout@v2
-      with:
-        repository: 'openwrt/openwrt'
-        
     - name: 添加 linux-5.10 u-boot-2019.7 EBAZ4205 补丁
       run: |
         git clone https://github.com/Elrori/openwrt-auto.git
