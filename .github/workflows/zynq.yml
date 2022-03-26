@@ -39,8 +39,8 @@ jobs:
     - name: 添加 linux-5.10 u-boot-2019.7 EBAZ4205 补丁
       run: |
         git clone https://github.com/Elrori/openwrt-auto.git
-        mkdir target/linux/zynq/$(PATCHES_FILE)
-        cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/$(PATCHES_FILE)/
+        mkdir target/linux/zynq/$${{ env.PATCHES_FILE }}
+        cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/$${{ env.PATCHES_FILE }}/
         cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/111-u-boot-2019.07-ebaz4205-support.patch package/boot/uboot-zynq/patches/
         git apply openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/openwrt-ebaz4205.patch
       
