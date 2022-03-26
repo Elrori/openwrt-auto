@@ -7,7 +7,7 @@ env:
   CONFIG_FILE: zynq-ebaz4205-lite.config
   DEVICE_NAME: zynq-ebaz4205
   TARGET_NAME: zynq
-  PATCHES_FILE: patches-5.10
+  PATCHES_FILE: patches
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
 
@@ -24,13 +24,14 @@ jobs:
           python3-distutils python3-setuptools rsync subversion swig time \
           xsltproc zlib1g-dev
           
-    - name: Get Kernel version
+    - name: 获取内核版本
       shell: bash {0}
       run: |
         KERNEL_VERSION=$(cat target/linux/${{ env.TARGET_NAME }}/Makefile | grep KERNEL_PATCHVER | sed -r 's|.*([0-9]+.[0-9]+)$|\1|')
         LINUX_VERSION=$(cat include/kernel-$KERNEL_VERSION | grep LINUX_VERSION-$KERNEL_VERSION | sed -r 's|.*(\.[0-9]+)$|\1|')
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV   
-        
+        echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
+
     - name: Checkout OpenWrt repository
       uses: actions/checkout@v2
       with:
@@ -39,8 +40,8 @@ jobs:
     - name: 添加 linux-5.10 u-boot-2019.7 EBAZ4205 补丁
       run: |
         git clone https://github.com/Elrori/openwrt-auto.git
-        mkdir target/linux/zynq/$${{ env.PATCHES_FILE }}
-        cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/$${{ env.PATCHES_FILE }}/
+        mkdir target/linux/zynq/${{ env.PATCHES_FILE }}
+        cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/${{ env.PATCHES_FILE }}/
         cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/111-u-boot-2019.07-ebaz4205-support.patch package/boot/uboot-zynq/patches/
         git apply openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/openwrt-ebaz4205.patch
       
