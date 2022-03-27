@@ -56,6 +56,7 @@ jobs:
     
     - name: 配置config
       run: | 
+        git clone https://github.com/Elrori/openwrt-auto.git
         cp openwrt-auto/config/$CONFIG_FILE .config
         
     - name: 下载软件包
