@@ -117,8 +117,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ env.KERNEL_VERSION }}-${{ env.DEVICE_NAME }}
-        release_name: Release v${{ env.KERNEL_VERSION }}-${{ env.DEVICE_NAME }}-${{ env.CONFIG_FILE }}
+        tag_name: v${{ env.KERNEL_VERSION }}-${{ env.DEVICE_NAME }}-precompileduboot
+        release_name: Release v${{ env.KERNEL_VERSION }}-${{ env.DEVICE_NAME }}-precompileduboot
         draft: false
         prerelease: false
         
