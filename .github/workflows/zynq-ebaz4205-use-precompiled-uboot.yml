@@ -89,7 +89,9 @@ jobs:
         cp build_dir/target-*/linux-zynq/linux-${{ env.KERNEL_VERSION }}/arch/arm/boot/dts/zynq-zed.dtb artifacts/zynq-ebaz4205.dtb
         cp build_dir/target-*/linux-zynq/root.ext4 artifacts/
         gzip -f -9n -c artifacts/Image > artifacts/Image.gz
+        echo `ls`
         scripts/mkits.sh -D ebang_zynq-ebaz4205 -o $(pwd)/artifacts/fit.its -k $(pwd)/artifacts/Image.gz -C gzip   -d $(pwd)/artifacts/zynq-ebaz4205.dtb   -a 0x8000 -e 0x8000    -c "config-1" -A arm -v ${{ env.KERNEL_VERSION }}
+        echo `ls`
         staging_dir/host/bin/mkimage -f $(pwd)/artifacts/fit.its $(pwd)/artifacts/fit.itb
         staging_dir/host/bin/mkfs.fat $(pwd)/artifacts/boot -C 16384
         staging_dir/host/bin/mcopy -i $(pwd)/artifacts/boot $(pwd)/artifacts/fpga/BOOT.bin ::boot.bin
