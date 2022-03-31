@@ -4,9 +4,11 @@ on:
   workflow_dispatch:
   
 env:
+  
   CONFIG_FILE: zynq-ebaz4205-lite.config
   DEVICE_NAME: zynq-ebaz4205
   TARGET_NAME: zynq
+  CONFIG_TAGS: 'v19.07.3'
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
 
@@ -24,16 +26,18 @@ jobs:
           xsltproc zlib1g-dev
 
     - name: Checkout OpenWrt repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: 'openwrt/openwrt'
+        fetch-depth: 0
+        ref: ${{ env.CONFIG_TAGS }}
           
     - name: 获取内核版本
       shell: bash {0}
       run: |
         KERNEL_VERSION=$(cat target/linux/${{ env.TARGET_NAME }}/Makefile | grep KERNEL_PATCHVER | sed -r 's|.*([0-9]+.[0-9]+)$|\1|')
         LINUX_VERSION=$(cat include/kernel-$KERNEL_VERSION | grep LINUX_VERSION-$KERNEL_VERSION | sed -r 's|.*(\.[0-9]+)$|\1|')
-        PATCHES_FILE=patches-$KERNEL_VERSION
+        PATCHES_FILE=patches
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV 
         echo "PATCHES_FILE=$PATCHES_FILE" >> $GITHUB_ENV  
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
@@ -47,10 +51,11 @@ jobs:
         cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/111-u-boot-2019.07-ebaz4205-support.patch package/boot/uboot-zynq/patches/
         git apply openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/openwrt-ebaz4205.patch
         echo "Linux patches dir: target/linux/zynq/${{ env.PATCHES_FILE }}"
+        echo "Apply patches success!"
 
-    - name: 导入第三方包，更新feed
+    - name: 导入第三方包
       run: |
-        #### add luci-app-ssr-plus #### 
+        ######## add luci-app-ssr-plus ################################################################
         git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
         svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
         svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
@@ -60,7 +65,10 @@ jobs:
         # 使用sed插入特定行，在未来可能会出现问题
         sed -i '23a\tools-y += ucl upx' tools/Makefile
         sed -i '41a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
+        ###############################################################################################
         
+    - name: 更新并下载feeds
+      run: |
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         
@@ -73,7 +81,6 @@ jobs:
         cp openwrt-auto/config/$CONFIG_FILE .config
         
     - name: 下载软件包
-      id: package
       run: |
         make defconfig
         make download -j$(nproc)
@@ -84,8 +91,7 @@ jobs:
         echo -e "$(nproc) thread compile"
         make -j$(nproc) V=sc
 
-    - name: 准备打包
-      if: env.LATEST_VERSION == 0
+    - name: 打包
       shell: bash {0}
       run: |
         mkdir artifacts
