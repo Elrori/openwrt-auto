@@ -38,11 +38,11 @@ jobs:
         PATCHES_FILE=patches
         KERNEL_VERSION=$(cat target/linux/${{ env.TARGET_NAME }}/Makefile | grep KERNEL_PATCHVER | sed -r 's|.*([0-9]+.[0-9]+)$|\1|')
         if [ ! -e "include/kernel-$KERNEL_VERSION" ]; then
-          VERSION_FILE = kernel-defaults.mk
+          VERSION_FILE=kernel-defaults.mk
         else
-          VERSION_FILE = kernel-$KERNEL_VERSION
+          VERSION_FILE=kernel-$KERNEL_VERSION
         fi
-        LINUX_VERSION  = $(cat include/$VERSION_FILE | grep LINUX_VERSION-$KERNEL_VERSION | sed -r 's|.*(\.[0-9]+)$|\1|')
+        LINUX_VERSION=$(cat include/$VERSION_FILE | grep LINUX_VERSION-$KERNEL_VERSION | sed -r 's|.*(\.[0-9]+)$|\1|')
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV 
         echo "PATCHES_FILE=$PATCHES_FILE" >> $GITHUB_ENV  
         echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
