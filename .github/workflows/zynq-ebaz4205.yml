@@ -26,7 +26,7 @@ jobs:
           xsltproc zlib1g-dev
 
     - name: Checkout OpenWrt repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
       with:
         repository: 'openwrt/openwrt'
         fetch-depth: 0
@@ -106,8 +106,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ env.KERNEL_VERSION }}-${{ env.CONFIG_FILE }}
-        release_name: Release v${{ env.KERNEL_VERSION }}-${{ env.CONFIG_FILE }}
+        tag_name: v${{ env.KERNEL_VERSION }}-${{ env.CONFIG_FILE }}-${{ env.CONFIG_TAGS }}
+        release_name: Release v${{ env.KERNEL_VERSION }}-${{ env.CONFIG_FILE }}-${{ env.CONFIG_TAGS }}
         draft: false
         prerelease: false
         
