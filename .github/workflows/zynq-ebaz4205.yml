@@ -7,7 +7,7 @@ env:
   CONFIG_FILE: zynq-ebaz4205-lite.config
   DEVICE_NAME: zynq-ebaz4205
   TARGET_NAME: zynq
-  CONFIG_TAGS: 'v19.07.3'
+  CONFIG_TAGS: 'master' #'v19.07.3'
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
 
