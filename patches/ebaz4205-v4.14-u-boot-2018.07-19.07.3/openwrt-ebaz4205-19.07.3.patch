@@ -43,8 +43,8 @@ index 6e45d2b..a4ffe93 100644
  
 +define Device/ebang_zynq-ebaz4205
 +        $(call Device/FitImageGzip)
-+        DEVICE_VENDOR := Ebang
-+        DEVICE_MODEL := EBAZ4205
++        DEVICE_TITLE := Ebang EBAZ4205
++        DEVICE_DTS := zynq-ebaz4205
 +endef
 +TARGET_DEVICES += ebang_zynq-ebaz4205
  $(eval $(call BuildImage))
