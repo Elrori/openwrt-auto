@@ -29,11 +29,11 @@ echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
 
 
 #echo "----------------------> Add EBAZ4205 patches"
-#mkdir -p target/linux/zynq/$PATCHES
-#cp $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/022-v4.14-ebaz4205-support.patch target/linux/zynq/$PATCHES
-#cp $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/111-u-boot-2018.07-ebaz4205-support.patch package/boot/uboot-zynq/patches
-#git apply $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/openwrt-ebaz4205-19.07.3.patch
-#echo "Apply patches to target/linux/zynq/$PATCHES!"
+mkdir -p target/linux/zynq/$PATCHES
+cp $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/022-v4.14-ebaz4205-support.patch target/linux/zynq/$PATCHES
+cp $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/111-u-boot-2018.07-ebaz4205-support.patch package/boot/uboot-zynq/patches
+git apply $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/openwrt-ebaz4205-19.07.3.patch
+echo "Apply patches to target/linux/zynq/$PATCHES!"
 
 
 
