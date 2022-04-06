@@ -1,11 +1,11 @@
 --- a/arch/arm/boot/dts/Makefile
 +++ b/arch/arm/boot/dts/Makefile
-@@ -1006,7 +1006,8 @@
- 	zynq-zc702.dtb \
+@@ -1007,7 +1007,8 @@
  	zynq-zc706.dtb \
  	zynq-zed.dtb \
--	zynq-zybo.dtb
-+	zynq-zybo.dtb \
+ 	zynq-zybo.dtb \
+-	zynq-zybo-z7.dtb
++	zynq-zybo-z7.dtb \
 +	zynq-ebaz4205.dtb
  dtb-$(CONFIG_MACH_ARMADA_370) += \
  	armada-370-db.dtb \
