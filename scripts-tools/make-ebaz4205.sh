@@ -38,16 +38,26 @@ echo "Apply patches to target/linux/zynq/$PATCHES!"
 
 
 
-#echo "----------------------> Add luci-app-ssr-plus"
-#git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
-#svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
-#svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
-#for i in "dns2socks" "microsocks" "ipt2socks" "pdnsd-alt" "redsocks2"; do 
-#  svn checkout "https://github.com/immortalwrt/packages/trunk/net/$i" "package/helloworld/$i"; 
-#done
-#sed -i '23a\tools-y += ucl upx' tools/Makefile # 使用sed插入特定行，在未来可能会出现问题
-#sed -i '41a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
+echo "----------------------> Add luci-app-ssr-plus"
+git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
+svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
+svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
+for i in "dns2socks" "microsocks" "ipt2socks" "pdnsd-alt" "redsocks2"; do 
+  svn checkout "https://github.com/immortalwrt/packages/trunk/net/$i" "package/helloworld/$i"; 
+done
+sed -i '23a\tools-y += ucl upx' tools/Makefile # 使用sed插入特定行，在未来可能会出现问题
+sed -i '44a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
 
+echo "----------------------> Add luci-app-openclash"
+svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/luci-app-openclas
+mkdir -p package/base-files/files/etc/openclash/core
+# for updates, go to: https://github.com/Dreamacro/clash/releases
+wget -qO- https://github.com/Dreamacro/clash/releases/download/v1.4.2/clash-linux-armv7-v1.4.2.gz | gunzip -c > package/base-files/files/etc/openclash/core/clash
+# for updates, go to: https://github.com/vernesong/OpenClash/releases/tag/TUN-Premium
+wget -qO- https://github.com/vernesong/OpenClash/releases/download/TUN-Premium/clash-linux-armv7-2021.03.10.gz | gunzip -c > package/base-files/files/etc/openclash/core/clash_tun
+# for updates, go to: https://github.com/vernesong/OpenClash/releases/tag/TUN
+wget -qO- https://github.com/vernesong/OpenClash/releases/download/TUN/clash-linux-armv7.tar.gz | tar xOvz > package/base-files/files/etc/openclash/core/clash_game
+chmod +x package/base-files/files/etc/openclash/core/clash*
 
 
 
