@@ -69,12 +69,11 @@ make download -j$(nproc)
 echo "----------------------> make compile"
 make -j$(nproc) V=sc
 
-
 echo "----------------------> Pack artifacts"
 mkdir artifacts
 for file in bin/targets/*/*/*.gz; do
-  sudo bash -c "sha512sum $file | sed -r 's|([0-9a-z]+).*|\1|g' > $file.sha512sum"
-  sudo mv $file* artifacts/
+  bash -c "sha512sum $file | sed -r 's|([0-9a-z]+).*|\1|g' > $file.sha512sum"
+  mv $file* artifacts/
 done
 
 echo "----------------------> Finish"
