@@ -1,3 +1,15 @@
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -146,7 +146,8 @@
+ 	zynq-zed.dtb \
+ 	zynq-zturn.dtb \
+ 	zynq-zybo.dtb \
+-	zynq-zybo-z7.dtb
++	zynq-zybo-z7.dtb \
++	zynq-ebaz4205.dtb
+ dtb-$(CONFIG_ARCH_ZYNQMP) += \
+ 	zynqmp-mini-emmc0.dtb			\
+ 	zynqmp-mini-emmc1.dtb			\
 --- /dev/null	2022-03-25 12:10:22.099999999 +0800
 +++ b/configs/zynq_ebaz4205_defconfig	2022-03-26 12:12:11.926350840 +0800
 @@ -0,0 +1,86 @@
@@ -184,18 +196,6 @@
 +   u-boot,dm-pre-reloc;
 +   status = "okay";
 +};
---- a/arch/arm/dts/Makefile
-+++ b/arch/arm/dts/Makefile
-@@ -145,7 +145,8 @@ dtb-$(CONFIG_ARCH_ZYNQ) += \
- 	zynq-zc770-xm013.dtb \
- 	zynq-zed.dtb \
- 	zynq-zturn.dtb \
--	zynq-zybo.dtb
-+	zynq-zybo.dtb \
-+   zynq-ebaz4205.dtb
- dtb-$(CONFIG_ARCH_ZYNQMP) += \
- 	zynqmp-mini-emmc0.dtb			\
- 	zynqmp-mini-emmc1.dtb			\
 --- /dev/null	2022-03-28 10:13:34.089999999 +0800
 +++ b/board/xilinx/zynq/zynq-ebaz4205/ps7_init_gpl.c	2022-03-28 13:29:38.387668856 +0800
 @@ -0,0 +1,775 @@
