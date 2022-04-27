@@ -2,7 +2,7 @@
 CONFIG_FILE=zynq-ebaz4205-lite.config
 DEVICE_NAME=zynq-ebaz4205
 TARGET_NAME=zynq
-CONFIG_TAGS='v19.07.3' # v19.07 was a stable version for ebaz4205, modifications are not recommended
+CONFIG_TAGS='v19.07.3'
 TOP_DIR=$PWD
 
 echo "----------------------> Get openwrt source master"
@@ -15,7 +15,6 @@ echo "Top dir: $TOP_DIR"
 pushd openwrt
 echo "Enter: $PWD"
 
-
 echo "----------------------> Get kernel version"
 KERNEL_VERSION=$(cat target/linux/$TARGET_NAME/Makefile | grep KERNEL_PATCHVER | sed -r 's|.*([0-9]+.[0-9]+)$|\1|')
 PATCHES=patches-$KERNEL_VERSION
@@ -27,7 +26,6 @@ fi
 LINUX_VERSION=$(cat include/$VERSION_FILE | grep LINUX_VERSION-$KERNEL_VERSION | sed -r 's|.*(\.[0-9]+)$|\1|')
 echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
 
-
 echo "----------------------> Add EBAZ4205 patches"
 mkdir -p target/linux/zynq/$PATCHES
 echo -e "bootargs=console=ttyPS0,115200n8 root=/dev/mmcblk0p2 rootwait earlyprintk \n\
@@ -38,9 +36,6 @@ cp $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/022-v4.14-ebaz4205-sup
 cp $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/026-u-boot-2018.07-ebaz4205-support.patch package/boot/uboot-zynq/patches
 git apply $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/openwrt-ebaz4205-19.07.3.patch
 echo "Apply patches to target/linux/zynq/$PATCHES!"
-
-
-
 
 echo "----------------------> Add luci-app-ssr-plus"
 git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
@@ -55,30 +50,25 @@ sed -i '44a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
 echo "----------------------> Add luci-app-openclash"
 svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/luci-app-openclash
 mkdir -p package/base-files/files/etc/openclash/core
-# for updates, go to: https://github.com/Dreamacro/clash/releases
-wget -qO- https://github.com/Dreamacro/clash/releases/download/v1.4.2/clash-linux-armv7-v1.4.2.gz | gunzip -c > package/base-files/files/etc/openclash/core/clash
-# for updates, go to: https://github.com/vernesong/OpenClash/releases/tag/TUN-Premium
-wget -qO- https://github.com/vernesong/OpenClash/releases/download/TUN-Premium/clash-linux-armv7-2022.03.21.gz | gunzip -c > package/base-files/files/etc/openclash/core/clash_tun
-# for updates, go to: https://github.com/vernesong/OpenClash/releases/tag/TUN
-wget -qO- https://github.com/vernesong/OpenClash/releases/download/TUN/clash-linux-armv7.tar.gz | tar xOvz > package/base-files/files/etc/openclash/core/clash_game
+wget -O clash.gz https://github.com/Dreamacro/clash/releases/download/v1.4.2/clash-linux-armv7-v1.4.2.gz 
+wget -O clash_tun.gz https://github.com/vernesong/OpenClash/releases/download/TUN-Premium/clash-linux-armv7-2022.04.11.gz # for updates, go to: https://github.com/vernesong/OpenClash/releases/tag/TUN-Premium
+wget -O clash_game.tar.gz https://github.com/vernesong/OpenClash/releases/download/TUN/clash-linux-armv7.tar.gz 
+gunzip clash.gz && mv clash package/base-files/files/etc/openclash/core
+gunzip clash_tun.gz && mv clash_tun package/base-files/files/etc/openclash/core
+tar -zxvf clash_game.tar.gz && mv clash clash_game && mv clash_game package/base-files/files/etc/openclash/core
 chmod +x package/base-files/files/etc/openclash/core/clash*
-
-
 
 echo "----------------------> Get feeds"
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 
-
 echo "----------------------> Add config from elrori/openwrt-auto"
 make menuconfig
 #cp $TOP_DIR/config/$CONFIG_FILE .config
 
-
 echo "----------------------> make download"
 make defconfig
 make download -j$(nproc)
-
 
 echo "----------------------> make compile"
 make -j$(nproc) V=sc
