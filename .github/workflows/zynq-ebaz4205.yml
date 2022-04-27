@@ -7,7 +7,7 @@ env:
   CONFIG_FILE: zynq-ebaz4205-lite.config
   DEVICE_NAME: zynq-ebaz4205
   TARGET_NAME: zynq
-  CONFIG_TAGS: 'v22.03.0-rc1'
+  CONFIG_TAGS: 'v19.07.1'
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
 
@@ -56,23 +56,27 @@ jobs:
         bitstream_image=system.bit \n\
         sdbootfit=echo Loading bitstream from SD/MMC/eMMC to RAM... && fatload mmc 0 0x3000000 ${bitstream_image} && fpga loadb 0 0x3000000 ${filesize} && echo Run uEnv.txt copying Linux from SD to RAM... && fatload mmc 0 0x1000000 fit.itb && echo Boot fit.itb from RAM && bootm 0x1000000 \n\
         uenvcmd=run sdbootfit" > package/boot/uboot-zynq/files/uEnv-default.txt
-        cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/${{ env.PATCHES_FILE }}/
-        cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/111-u-boot-2019.07-ebaz4205-support.patch package/boot/uboot-zynq/patches/
-        git apply openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/openwrt-ebaz4205.patch
+        #cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/${{ env.PATCHES_FILE }}/
+        #cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/111-u-boot-2019.07-ebaz4205-support.patch package/boot/uboot-zynq/patches/
+        #git apply openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/openwrt-ebaz4205.patch
+        cp openwrt-auto/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/022-v4.14-ebaz4205-support.patch target/linux/zynq/$PATCHES
+        cp openwrt-auto/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/026-u-boot-2018.07-ebaz4205-support.patch package/boot/uboot-zynq/patches
+        git apply openwrt-auto/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/openwrt-ebaz4205-19.07.3.patch
+
         echo "Linux patches dir: target/linux/zynq/${{ env.PATCHES_FILE }}"
 
-    - name: 导入第三方包
-      run: |
+    #- name: 导入第三方包
+    #  run: |
         ######## add luci-app-ssr-plus ################################################################
-        git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
-        svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
-        svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
-        for i in "dns2socks" "microsocks" "ipt2socks" "pdnsd-alt" "redsocks2"; do 
-        svn checkout "https://github.com/immortalwrt/packages/trunk/net/$i" "package/helloworld/$i"; 
-        done
-        # 使用sed插入特定行，在未来可能会出现问题
-        sed -i '23a\tools-y += ucl upx' tools/Makefile
-        sed -i '41a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
+        #git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
+        #svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
+        #svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
+        #for i in "dns2socks" "microsocks" "ipt2socks" "pdnsd-alt" "redsocks2"; do 
+        #svn checkout "https://github.com/immortalwrt/packages/trunk/net/$i" "package/helloworld/$i"; 
+        #done
+        ## 使用sed插入特定行，在未来可能会出现问题
+        #sed -i '23a\tools-y += ucl upx' tools/Makefile
+        #sed -i '41a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
         ###############################################################################################
         
     - name: 更新并下载feeds
