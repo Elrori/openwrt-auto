@@ -7,7 +7,7 @@ env:
   CONFIG_FILE: zynq-ebaz4205-lite.config
   DEVICE_NAME: zynq-ebaz4205
   TARGET_NAME: zynq
-  CONFIG_TAGS: 'v19.07.3'
+  CONFIG_TAGS: 'v22.03.0-rc1'
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
 
@@ -52,11 +52,14 @@ jobs:
       run: |
         git clone https://github.com/Elrori/openwrt-auto.git
         mkdir target/linux/zynq/${{ env.PATCHES_FILE }}
+        echo -e "bootargs=console=ttyPS0,115200n8 root=/dev/mmcblk0p2 rootwait earlyprintk \n\
+        bitstream_image=system.bit \n\
+        sdbootfit=echo Loading bitstream from SD/MMC/eMMC to RAM... && fatload mmc 0 0x3000000 ${bitstream_image} && fpga loadb 0 0x3000000 ${filesize} && echo Run uEnv.txt copying Linux from SD to RAM... && fatload mmc 0 0x1000000 fit.itb && echo Boot fit.itb from RAM && bootm 0x1000000 \n\
+        uenvcmd=run sdbootfit" > package/boot/uboot-zynq/files/uEnv-default.txt
         cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/${{ env.PATCHES_FILE }}/
         cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/111-u-boot-2019.07-ebaz4205-support.patch package/boot/uboot-zynq/patches/
         git apply openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/openwrt-ebaz4205.patch
         echo "Linux patches dir: target/linux/zynq/${{ env.PATCHES_FILE }}"
-        echo "Apply patches success!"
 
     - name: 导入第三方包
       run: |
@@ -77,13 +80,13 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
         
-    #- name: SSH连接，手动 make menuconfig
-    #  uses: sypopo/debugger-action@master
-    #  if: env.SSH_ACTIONS == 'true'
+    - name: SSH连接，手动 make menuconfig
+      uses: sypopo/debugger-action@master
+      if: env.SSH_ACTIONS == 'true'
     
-    - name: 配置config
-      run: | 
-        cp openwrt-auto/config/$CONFIG_FILE .config
+    #- name: 配置config
+    #  run: | 
+    #    cp openwrt-auto/config/$CONFIG_FILE .config
         
     - name: 下载软件包
       run: |
@@ -104,6 +107,9 @@ jobs:
           sudo bash -c "sha512sum $file | sed -r 's|([0-9a-z]+).*|\1|g' > $file.sha512sum"
           sudo mv $file* artifacts/
         done
+        svn checkout https://github.com/Elrori/EBAZ4205/trunk/archive/2018.3-1 fpga/
+        mv fpga/system667.bit fpga/system.bit 
+        mv fpga/system.bit artifacts
 
     - name: 创建 release
       id: create_release
