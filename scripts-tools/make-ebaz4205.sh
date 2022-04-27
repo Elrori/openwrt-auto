@@ -30,7 +30,10 @@ echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
 
 echo "----------------------> Add EBAZ4205 patches"
 mkdir -p target/linux/zynq/$PATCHES
-echo -e "bootargs=console=ttyPS0,115200n8 root=/dev/mmcblk0p2 rootwait earlyprintk \nuenvcmd=run sdbootfit \nsdbootfit=echo Run uEnv.txt copying Linux from SD to RAM... && fatload mmc 0 0x1000000 fit.itb && echo Boot fit.itb from RAM && bootm 0x1000000; " > package/boot/uboot-zynq/files/uEnv-default.txt
+echo -e "bootargs=console=ttyPS0,115200n8 root=/dev/mmcblk0p2 rootwait earlyprintk \n\
+bitstream_image=system.bit \n\
+sdbootfit=echo Loading bitstream from SD/MMC/eMMC to RAM... && fatload mmc 0 0x3000000 ${bitstream_image} && fpga loadb 0 0x3000000 ${filesize} && echo Run uEnv.txt copying Linux from SD to RAM... && fatload mmc 0 0x1000000 fit.itb && echo Boot fit.itb from RAM && bootm 0x1000000 \n\
+uenvcmd=run sdbootfit" > package/boot/uboot-zynq/files/uEnv-default.txt
 cp $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/022-v4.14-ebaz4205-support.patch target/linux/zynq/$PATCHES
 cp $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/026-u-boot-2018.07-ebaz4205-support.patch package/boot/uboot-zynq/patches
 git apply $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/openwrt-ebaz4205-19.07.3.patch
