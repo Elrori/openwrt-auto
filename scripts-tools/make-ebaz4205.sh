@@ -37,16 +37,6 @@ cp $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/026-u-boot-2018.07-eba
 git apply $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/openwrt-ebaz4205-19.07.3.patch
 echo "Apply patches to target/linux/zynq/$PATCHES"
 
-# echo "---------------------- Add luci-app-ssr-plus ----------------------"
-# git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
-# svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
-# svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
-# for i in "dns2socks" "microsocks" "ipt2socks" "pdnsd-alt" "redsocks2"; do 
-#   svn checkout "https://github.com/immortalwrt/packages/trunk/net/$i" "package/helloworld/$i"; 
-# done
-# sed -i '23a\tools-y += ucl upx' tools/Makefile # 使用sed插入特定行，在未来可能会出现问题
-# sed -i '44a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
-
 echo "---------------------- Add luci-app-openclash ----------------------"
 rm -rf feeds/packages/libs/libcap
 svn co https://github.com/openwrt/packages/branches/openwrt-21.02/libs/libcap/ feeds/packages/libs/libcap
@@ -59,7 +49,6 @@ gunzip clash.gz && mv clash package/base-files/files/etc/openclash/core
 gunzip clash_tun.gz && mv clash_tun package/base-files/files/etc/openclash/core
 tar -zxvf clash_game.tar.gz && mv clash clash_game && mv clash_game package/base-files/files/etc/openclash/core
 chmod +x package/base-files/files/etc/openclash/core/clash*
-
 
 echo "---------------------- Get feeds ----------------------"
 ./scripts/feeds update -a
