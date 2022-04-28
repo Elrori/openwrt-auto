@@ -56,8 +56,8 @@ echo "---------------------- Get feeds ----------------------"
 ./scripts/feeds install -a
 
 echo "--------------------- Add config-----------------------"
-make menuconfig
-#cp $TOP_DIR/config/$CONFIG_FILE .config
+#make menuconfig
+cp $TOP_DIR/config/$CONFIG_FILE .config
 
 echo "-------------------- make download --------------------"
 make defconfig
