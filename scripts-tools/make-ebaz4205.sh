@@ -1,5 +1,5 @@
 #!/bin/bash
-CONFIG_FILE=zynq-ebaz4205-lite.config
+CONFIG_FILE=zynq-ebaz4205-v19.07.3-full.config
 DEVICE_NAME=zynq-ebaz4205
 TARGET_NAME=zynq
 CONFIG_TAGS='v19.07.3'
@@ -43,7 +43,8 @@ svn co https://github.com/openwrt/packages/branches/openwrt-21.02/libs/libcap/ f
 svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/luci-app-openclash
 mkdir -p package/base-files/files/etc/openclash/core
 wget -O clash.gz https://github.com/Dreamacro/clash/releases/download/v1.4.2/clash-linux-armv7-v1.4.2.gz 
-wget -O clash_tun.gz https://github.com/vernesong/OpenClash/releases/download/TUN-Premium/clash-linux-armv7-2022.04.11.gz # for updates, go to: https://github.com/vernesong/OpenClash/releases/tag/TUN-Premium
+# TODO: check the latest version of vernesong/OpenClash, go to: https://github.com/vernesong/OpenClash/releases/tag/TUN-Premium
+wget -O clash_tun.gz https://github.com/vernesong/OpenClash/releases/download/TUN-Premium/clash-linux-armv7-2022.04.11.gz 
 wget -O clash_game.tar.gz https://github.com/vernesong/OpenClash/releases/download/TUN/clash-linux-armv7.tar.gz 
 gunzip clash.gz && mv clash package/base-files/files/etc/openclash/core
 gunzip clash_tun.gz && mv clash_tun package/base-files/files/etc/openclash/core
