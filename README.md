@@ -1,6 +1,6 @@
 # openwrt-auto
 
-Openwrt action for Ebang EBAZ4205 with anti-gfw tools built-in.
+Openwrt action for Ebang EBAZ4205 with anti-gfw tools built-in. [Releases](https://github.com/Elrori/openwrt-auto/releases)
 
 To build a stable version of ebaz4205-openwrt, pls run make-ebaz4205-v4.14.sh manually.
 
