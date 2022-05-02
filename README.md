@@ -2,7 +2,7 @@
 
 Openwrt action for Ebang EBAZ4205 with anti-gfw tools built-in. 
 
-[Releases Download](https://github.com/Elrori/openwrt-auto/releases). Note: you need to copy system.bit to SDCard FAT partition manually.
+[Releases Download](https://github.com/Elrori/openwrt-auto/releases)(LuCi Chinese). Note: you need to copy system.bit to SDCard FAT partition manually.
 
 To build a stable version of ebaz4205-openwrt, pls run make-ebaz4205-v4.14.sh manually.
 
