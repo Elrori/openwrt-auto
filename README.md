@@ -16,3 +16,5 @@ libncursesw5-dev libssl-dev python python2.7-dev python3 unzip wget \
 python3-distutils python3-setuptools rsync subversion swig time \
 xsltproc zlib1g-dev
 ```
+
+[Related articles](https://blog.csdn.net/z951573431/article/details/123819564)(zh_cn)
