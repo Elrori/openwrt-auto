@@ -2,7 +2,7 @@
 
 Openwrt action for Ebang EBAZ4205 with anti-gfw tools built-in.
 
-To build a stable version of ebaz4205-openwrt,pls run make-ebaz4205-v4.14.sh.
+To build a stable version of ebaz4205-openwrt manually,pls run make-ebaz4205-v4.14.sh.
 
 Ubuntu dependency：
 
