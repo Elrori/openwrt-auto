@@ -38,8 +38,6 @@ git apply $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/openwrt-ebaz420
 echo "Apply patches to target/linux/zynq/$PATCHES"
 
 echo "---------------------- Add luci-app-openclash ----------------------"
-rm -rf feeds/packages/libs/libcap
-svn co https://github.com/openwrt/packages/branches/openwrt-21.02/libs/libcap/ feeds/packages/libs/libcap
 svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/luci-app-openclash
 mkdir -p package/base-files/files/etc/openclash/core
 wget -O clash.gz https://github.com/Dreamacro/clash/releases/download/v1.4.2/clash-linux-armv7-v1.4.2.gz 
@@ -54,6 +52,11 @@ chmod +x package/base-files/files/etc/openclash/core/clash*
 echo "---------------------- Get feeds ----------------------"
 ./scripts/feeds update -a
 ./scripts/feeds install -a
+# Openclash dependence for 17.03 start
+rm -rf feeds/packages/libs/libcap
+svn co https://github.com/openwrt/packages/branches/openwrt-21.02/libs/libcap/ feeds/packages/libs/libcap
+./scripts/feeds install -a
+# Openclash dependence for 17.03  end
 
 echo "--------------------- Add config-----------------------"
 #make menuconfig
