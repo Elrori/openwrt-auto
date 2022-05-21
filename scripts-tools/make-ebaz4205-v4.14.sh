@@ -76,7 +76,6 @@ for file in bin/targets/*/*/*.gz; do
   mv $file* artifacts/
 done
 svn checkout https://github.com/Elrori/EBAZ4205/trunk/archive/2018.3-1 fpga/
-mv fpga/system667.bit fpga/system.bit 
 mv fpga/system.bit artifacts
 
 echo "----------------------- Finish ------------------------"
