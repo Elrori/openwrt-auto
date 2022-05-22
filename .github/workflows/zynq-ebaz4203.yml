@@ -1,4 +1,4 @@
-name: zynq-ebaz4205
+name: zynq-ebaz4203
 
 on:
   workflow_dispatch:
