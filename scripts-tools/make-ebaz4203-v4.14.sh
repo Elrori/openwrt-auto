@@ -1,5 +1,5 @@
 #!/bin/bash
-CONFIG_FILE=zynq-ebaz4203-v19.07.3-full.config
+CONFIG_FILE=zynq-ebaz4205-v19.07.3-full.config
 DEVICE_NAME=zynq-ebaz4203
 TARGET_NAME=zynq
 CONFIG_TAGS='v19.07.3'
@@ -59,8 +59,8 @@ svn co https://github.com/openwrt/packages/branches/openwrt-21.02/libs/libcap/ f
 # Openclash dependence for 17.03  end
 
 echo "--------------------- Add config-----------------------"
-make menuconfig
-#cp $TOP_DIR/config/$CONFIG_FILE .config
+# make menuconfig
+cp $TOP_DIR/config/$CONFIG_FILE .config
 
 echo "-------------------- make download --------------------"
 make defconfig
