@@ -52,15 +52,16 @@ chmod +x package/base-files/files/etc/openclash/core/clash*
 echo "---------------------- Get feeds ----------------------"
 ./scripts/feeds update -a
 ./scripts/feeds install -a
-# Openclash dependence for 17.03 start
+# Openclash dependence for 19.07 start
 rm -rf feeds/packages/libs/libcap
 svn co https://github.com/openwrt/packages/branches/openwrt-21.02/libs/libcap/ feeds/packages/libs/libcap
 ./scripts/feeds install -a
-# Openclash dependence for 17.03  end
+# Openclash dependence for 19.07  end
 
 echo "--------------------- Add config-----------------------"
 # make menuconfig
 cp $TOP_DIR/config/$CONFIG_FILE .config
+sed -i "s/CONFIG_TARGET_zynq_DEVICE_ebang_zynq-ebaz4205=y/CONFIG_TARGET_zynq_DEVICE_ebang_zynq-ebaz4203=y/g" .config
 
 echo "-------------------- make download --------------------"
 make defconfig
