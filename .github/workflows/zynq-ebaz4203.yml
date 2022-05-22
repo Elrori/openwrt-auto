@@ -1,0 +1,52 @@
+name: zynq-ebaz4205
+
+on:
+  workflow_dispatch:
+  
+env:
+  CONFIG_FILE: zynq-ebaz4203-full
+  DEVICE_NAME: zynq-ebaz4203
+  TARGET_NAME: zynq
+  CONFIG_TAGS: 'v19.07.3'
+  SSH_ACTIONS:  true
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    
+    - name: 初始环境
+      run: |
+          sudo apt update
+          sudo apt install build-essential ccache ecj fastjar file g++ gawk \
+          gettext git java-propose-classpath libelf-dev libncurses5-dev \
+          libncursesw5-dev libssl-dev python python2.7-dev python3 unzip wget \
+          python3-distutils python3-setuptools rsync subversion swig time \
+          xsltproc zlib1g-dev
+
+    - name: 固件编译
+      id: compile
+      run: |
+        git clone https://github.com/Elrori/openwrt-auto.git
+        cd openwrt-auto
+        ./scripts-tools/make-ebaz4203-v4.14.sh
+        
+    - name: 创建 release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v1.1.2
+        release_name: zynq-ebaz4203-linux-4.14-openwrt-19.07.3-full-v1.1.2
+        draft: false
+        prerelease: false
+        
+    - name: 上传 release
+      uses: NBTX/upload-release-assets@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        targets: openwrt-auto/openwrt/artifacts/*
