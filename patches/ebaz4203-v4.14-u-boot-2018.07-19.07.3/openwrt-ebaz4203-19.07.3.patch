@@ -1,0 +1,50 @@
+diff --git a/package/boot/uboot-zynq/Makefile b/package/boot/uboot-zynq/Makefile
+index 2e4c6cc..dd400d3 100644
+--- a/package/boot/uboot-zynq/Makefile
++++ b/package/boot/uboot-zynq/Makefile
+@@ -44,11 +44,17 @@ define U-Boot/zybo_z7
+   BUILD_DEVICES:=digilent_zynq-zybo-z7
+ endef
+ 
++define U-Boot/ebaz4203
++  NAME:=Ebang EBAZ4203 board
++  BUILD_DEVICES:=ebang_zynq-ebaz4203
++endef
++
+ UBOOT_TARGETS := \
+ 	zc702 \
+ 	zed \
+ 	zybo \
+-	zybo_z7
++	zybo_z7 \
++    ebaz4203
+ 
+ define Build/InstallDev
+ 	$(INSTALL_DIR) $(STAGING_DIR_IMAGE)
+diff --git a/target/linux/zynq/base-files/etc/board.d/02_network b/target/linux/zynq/base-files/etc/board.d/02_network
+index b3670cf..bb7f4f3 100755
+--- a/target/linux/zynq/base-files/etc/board.d/02_network
++++ b/target/linux/zynq/base-files/etc/board.d/02_network
+@@ -9,6 +9,7 @@ case "$(board_name)" in
+ avnet,zynq-zed | \
+ digilent,zynq-zybo | \
+ digilent,zynq-zybo-z7 | \
++ebang,zynq-ebaz4203 | \
+ xlnx,zynq-zc702)
+ 	ucidef_set_interface_lan 'eth0'
+ 	;;
+diff --git a/target/linux/zynq/image/Makefile b/target/linux/zynq/image/Makefile
+index 6e45d2b..a4ffe93 100644
+--- a/target/linux/zynq/image/Makefile
++++ b/target/linux/zynq/image/Makefile
+@@ -78,4 +78,10 @@ define Device/xlnx_zynq-zc702
+ endef
+ TARGET_DEVICES += xlnx_zynq-zc702
+ 
++define Device/ebang_zynq-ebaz4203
++        $(call Device/FitImageGzip)
++        DEVICE_TITLE := Ebang EBAZ4203
++        DEVICE_DTS := zynq-ebaz4203
++endef
++TARGET_DEVICES += ebang_zynq-ebaz4203
+ $(eval $(call BuildImage))

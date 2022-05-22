@@ -1,0 +1,86 @@
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -1007,7 +1007,8 @@
+ 	zynq-zc706.dtb \
+ 	zynq-zed.dtb \
+ 	zynq-zybo.dtb \
+-	zynq-zybo-z7.dtb
++	zynq-zybo-z7.dtb \
++	zynq-ebaz4203.dtb
+ dtb-$(CONFIG_MACH_ARMADA_370) += \
+ 	armada-370-db.dtb \
+ 	armada-370-dlink-dns327l.dtb \
+--- /dev/null
++++ b/arch/arm/boot/dts/zynq-ebaz4203.dts
+@@ -0,0 +1,71 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++*  Copyright (C) 2011 - 2015 Xilinx
++*  Copyright (C) 2012 National Instruments Corp.
++*/
++/dts-v1/;
++#include "zynq-7000.dtsi"
++#define GPIO_ACTIVE_HIGH 0
++#define GPIO_ACTIVE_LOW  1
++/ {
++   model = "Ebang EBAZ4203";
++   compatible = "ebang,ebaz4203", "xlnx,zynq-7000";
++
++   aliases {
++      ethernet0 = &gem0;
++      serial0 = &uart1;
++      mmc0 = &sdhci0;
++   };
++
++   memory@0 {
++      device_type = "memory";
++      reg = <0x0 0x20000000>;
++   };
++
++   chosen {
++      bootargs = "";
++      stdout-path = "serial0:115200n8";
++   };
++
++   ebaz-leds {
++      compatible = "gpio-leds";
++
++      led-green {
++         label = "green";
++         gpios = <&gpio0 54 GPIO_ACTIVE_LOW>;
++         default-state = "on";
++      };
++      led-red {
++         label = "red";
++         gpios = <&gpio0 55 GPIO_ACTIVE_LOW>;
++         default-state = "on";
++      };
++   };
++
++};
++
++&clkc {
++   ps-clk-frequency = <33333333>;
++};
++
++&gem0 {
++   status = "okay";
++   phy-mode = "mii";
++   phy-handle = <&phy>;
++
++   /* PHY clock */
++   assigned-clocks = <&clkc 18>;
++   assigned-clock-rates = <25000000>;
++
++   phy: ethernet-phy@0 {
++      reg = <0>;
++   };
++};
++
++&sdhci0 {
++   status = "okay";
++};
++
++&uart1 {
++   status = "okay";
++};
