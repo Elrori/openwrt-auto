@@ -1,10 +1,10 @@
 # openwrt-auto
 
-Openwrt action for Ebang EBAZ4205... with anti-gfw tools built-in. 
+Openwrt action for Ebang EBAZ4205,EBAZ4203... with anti-gfw tools built-in. 
 
 [Releases Download](https://github.com/Elrori/openwrt-auto/releases)(LuCi Chinese). Note: you need to copy system.bit to SDCard FAT partition manually.
 
-To build a stable version of ebaz4205-openwrt, pls run make-ebaz4205-v4.14.sh manually.
+To build a stable version of ebaz4205/ebaz4203-openwrt, pls run make-ebaz420x-v4.14.sh manually.
 
 Ubuntu dependency：
 
