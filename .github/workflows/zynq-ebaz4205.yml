@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
   
 env:
-  CONFIG_FILE: zynq-ebaz4205-lite.config
+  CONFIG_FILE: zynq-ebaz4205-full
   DEVICE_NAME: zynq-ebaz4205
   TARGET_NAME: zynq
-  CONFIG_TAGS: 'v19.07.1'
+  CONFIG_TAGS: 'v19.07.3'
   SSH_ACTIONS:  true
   TZ: Asia/Shanghai
 
@@ -25,104 +25,21 @@ jobs:
           python3-distutils python3-setuptools rsync subversion swig time \
           xsltproc zlib1g-dev
 
-    - name: Checkout OpenWrt repository
-      uses: actions/checkout@v2
-      with:
-        repository: 'openwrt/openwrt'
-        fetch-depth: 1
-        ref: ${{ env.CONFIG_TAGS }}
-          
-    - name: 获取内核版本
-      shell: bash {0}
-      run: |
-        PATCHES_FILE=patches
-        KERNEL_VERSION=$(cat target/linux/${{ env.TARGET_NAME }}/Makefile | grep KERNEL_PATCHVER | sed -r 's|.*([0-9]+.[0-9]+)$|\1|')
-        if [ ! -e "include/kernel-$KERNEL_VERSION" ]; then
-          VERSION_FILE=kernel-version.mk
-        else
-          VERSION_FILE=kernel-$KERNEL_VERSION
-        fi
-        LINUX_VERSION=$(cat include/$VERSION_FILE | grep LINUX_VERSION-$KERNEL_VERSION | sed -r 's|.*(\.[0-9]+)$|\1|')
-        echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION" >> $GITHUB_ENV 
-        echo "PATCHES_FILE=$PATCHES_FILE" >> $GITHUB_ENV  
-        echo "KERNEL_VERSION=$KERNEL_VERSION$LINUX_VERSION"
-        echo "PATCHES_FILE=$PATCHES_FILE"
-
-    - name: 添加 linux-5.10 u-boot-2019.7 EBAZ4205 补丁
-      run: |
-        git clone https://github.com/Elrori/openwrt-auto.git
-        mkdir target/linux/zynq/${{ env.PATCHES_FILE }}
-        echo -e "bootargs=console=ttyPS0,115200n8 root=/dev/mmcblk0p2 rootwait earlyprintk \n\
-        bitstream_image=system.bit \n\
-        sdbootfit=echo Loading bitstream from SD/MMC/eMMC to RAM... && fatload mmc 0 0x3000000 ${bitstream_image} && fpga loadb 0 0x3000000 ${filesize} && echo Run uEnv.txt copying Linux from SD to RAM... && fatload mmc 0 0x1000000 fit.itb && echo Boot fit.itb from RAM && bootm 0x1000000 \n\
-        uenvcmd=run sdbootfit" > package/boot/uboot-zynq/files/uEnv-default.txt
-        #cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/020-v5.10-ebaz4205-support.patch target/linux/zynq/${{ env.PATCHES_FILE }}/
-        #cp openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/111-u-boot-2019.07-ebaz4205-support.patch package/boot/uboot-zynq/patches/
-        #git apply openwrt-auto/patches/ebaz4205-v5.10-u-boot-2019.07/openwrt-ebaz4205.patch
-        cp openwrt-auto/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/022-v4.14-ebaz4205-support.patch target/linux/zynq/$PATCHES
-        cp openwrt-auto/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/026-u-boot-2018.07-ebaz4205-support.patch package/boot/uboot-zynq/patches
-        git apply openwrt-auto/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/openwrt-ebaz4205-19.07.3.patch
-
-        echo "Linux patches dir: target/linux/zynq/${{ env.PATCHES_FILE }}"
-
-    #- name: 导入第三方包
-    #  run: |
-        ######## add luci-app-ssr-plus ################################################################
-        #git clone --depth=1 https://github.com/fw876/helloworld.git package/helloworld
-        #svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/ucl tools/ucl
-        #svn checkout https://github.com/coolsnowwolf/lede/trunk/tools/upx tools/upx
-        #for i in "dns2socks" "microsocks" "ipt2socks" "pdnsd-alt" "redsocks2"; do 
-        #svn checkout "https://github.com/immortalwrt/packages/trunk/net/$i" "package/helloworld/$i"; 
-        #done
-        ## 使用sed插入特定行，在未来可能会出现问题
-        #sed -i '23a\tools-y += ucl upx' tools/Makefile
-        #sed -i '41a\$(curdir)/upx/compile := $(curdir)/ucl/compile' tools/Makefile
-        ###############################################################################################
-        
-    - name: 更新并下载feeds
-      run: |
-        ./scripts/feeds update -a
-        ./scripts/feeds install -a
-        
-    - name: SSH连接，手动 make menuconfig
-      uses: sypopo/debugger-action@master
-      if: env.SSH_ACTIONS == 'true'
-    
-    #- name: 配置config
-    #  run: | 
-    #    cp openwrt-auto/config/$CONFIG_FILE .config
-        
-    - name: 下载软件包
-      run: |
-        make defconfig
-        make download -j$(nproc)
-
     - name: 固件编译
       id: compile
       run: |
-        echo -e "$(nproc) thread compile"
-        make -j$(nproc) V=sc
-
-    - name: 打包
-      shell: bash {0}
-      run: |
-        mkdir artifacts
-        for file in bin/targets/*/*/*.gz; do
-          sudo bash -c "sha512sum $file | sed -r 's|([0-9a-z]+).*|\1|g' > $file.sha512sum"
-          sudo mv $file* artifacts/
-        done
-        svn checkout https://github.com/Elrori/EBAZ4205/trunk/archive/2018.3-1 fpga/
-        mv fpga/system667.bit fpga/system.bit 
-        mv fpga/system.bit artifacts
-
+        git clone https://github.com/Elrori/openwrt-auto.git
+        cd openwrt-auto
+        ./scripts-tools/make-ebaz4205-v4.14.sh
+        
     - name: 创建 release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ env.KERNEL_VERSION }}-${{ env.CONFIG_FILE }}-${{ env.CONFIG_TAGS }}
-        release_name: Release v${{ env.KERNEL_VERSION }}-${{ env.CONFIG_FILE }}-${{ env.CONFIG_TAGS }}
+        tag_name: v1.2.0
+        release_name: zynq-ebaz4205-linux-4.14-openwrt-19.07.3-full-v1.2.0
         draft: false
         prerelease: false
         
@@ -132,4 +49,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        targets: artifacts/*
+        targets: openwrt-auto/openwrt/artifacts/*
