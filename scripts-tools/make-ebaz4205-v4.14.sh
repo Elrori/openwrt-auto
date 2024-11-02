@@ -53,9 +53,12 @@ echo "---------------------- Get feeds ----------------------"
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 # Openclash dependence for 17.03 start
-# rm -rf feeds/packages/libs/libcap
+rm -rf feeds/packages/libs/libcap
 # svn co https://github.com/openwrt/packages/branches/openwrt-21.02/libs/libcap/ feeds/packages/libs/libcap
-# ./scripts/feeds install -a
+git clone https://github.com/openwrt/packages.git -b openwrt-21.02 --depth=1 tmp/
+cp -rf tmp/libs/libcap feeds/packages/libs/
+rm -rf tmp/
+./scripts/feeds install -a
 # Openclash dependence for 17.03  end
 
 echo "--------------------- Add config-----------------------"
