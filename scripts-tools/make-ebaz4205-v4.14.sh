@@ -37,25 +37,25 @@ cp $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/026-u-boot-2018.07-eba
 git apply $TOP_DIR/patches/ebaz4205-v4.14-u-boot-2018.07-19.07.3/openwrt-ebaz4205-19.07.3.patch
 echo "Apply patches to target/linux/zynq/$PATCHES"
 
-echo "---------------------- Add luci-app-openclash ----------------------"
-svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/luci-app-openclash
-mkdir -p package/base-files/files/etc/openclash/core
-wget -O clash.gz https://github.com/Dreamacro/clash/releases/download/v1.4.2/clash-linux-armv7-v1.4.2.gz 
-# TODO: check the latest version of vernesong/OpenClash, go to: https://github.com/vernesong/OpenClash/releases/tag/TUN-Premium
-wget -O clash_tun.gz https://github.com/vernesong/OpenClash/releases/download/TUN-Premium/clash-linux-armv7-2022.04.11.gz 
-wget -O clash_game.tar.gz https://github.com/vernesong/OpenClash/releases/download/TUN/clash-linux-armv7.tar.gz 
-gunzip clash.gz && mv clash package/base-files/files/etc/openclash/core
-gunzip clash_tun.gz && mv clash_tun package/base-files/files/etc/openclash/core
-tar -zxvf clash_game.tar.gz && mv clash clash_game && mv clash_game package/base-files/files/etc/openclash/core
-chmod +x package/base-files/files/etc/openclash/core/clash*
+# echo "---------------------- Add luci-app-openclash ----------------------"
+# svn co https://github.com/vernesong/OpenClash/trunk/luci-app-openclash package/luci-app-openclash
+# mkdir -p package/base-files/files/etc/openclash/core
+# wget -O clash.gz https://github.com/Dreamacro/clash/releases/download/v1.4.2/clash-linux-armv7-v1.4.2.gz 
+# # TODO: check the latest version of vernesong/OpenClash, go to: https://github.com/vernesong/OpenClash/releases/tag/TUN-Premium
+# wget -O clash_tun.gz https://github.com/vernesong/OpenClash/releases/download/TUN-Premium/clash-linux-armv7-2022.04.11.gz 
+# wget -O clash_game.tar.gz https://github.com/vernesong/OpenClash/releases/download/TUN/clash-linux-armv7.tar.gz 
+# gunzip clash.gz && mv clash package/base-files/files/etc/openclash/core
+# gunzip clash_tun.gz && mv clash_tun package/base-files/files/etc/openclash/core
+# tar -zxvf clash_game.tar.gz && mv clash clash_game && mv clash_game package/base-files/files/etc/openclash/core
+# chmod +x package/base-files/files/etc/openclash/core/clash*
 
 echo "---------------------- Get feeds ----------------------"
 ./scripts/feeds update -a
 ./scripts/feeds install -a
 # Openclash dependence for 17.03 start
-rm -rf feeds/packages/libs/libcap
-svn co https://github.com/openwrt/packages/branches/openwrt-21.02/libs/libcap/ feeds/packages/libs/libcap
-./scripts/feeds install -a
+# rm -rf feeds/packages/libs/libcap
+# svn co https://github.com/openwrt/packages/branches/openwrt-21.02/libs/libcap/ feeds/packages/libs/libcap
+# ./scripts/feeds install -a
 # Openclash dependence for 17.03  end
 
 echo "--------------------- Add config-----------------------"
