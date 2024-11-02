@@ -28,7 +28,7 @@ jobs:
     - name: 固件编译
       id: compile
       run: |
-        git clone https://github.com/Elrori/openwrt-auto.git
+        git clone https://github.com/Elrori/openwrt-auto.git -b dev
         cd openwrt-auto
         ./scripts-tools/make-ebaz4205-v4.14.sh
         
