@@ -12,7 +12,7 @@
  	armada-370-dlink-dns327l.dtb \
 --- /dev/null
 +++ b/arch/arm/boot/dts/zynq-ebaz4205.dts
-@@ -0,0 +1,92 @@
+@@ -0,0 +1,108 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 +*  Copyright (C) 2011 - 2015 Xilinx
