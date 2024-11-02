@@ -37,6 +37,22 @@
 +      reg = <0x0 0x10000000>;
 +   };
 +
++   reserved-memory {
++      #address-cells = <1>;
++      #size-cells = <1>;
++      ranges;
++
++      reserved: buffer@0x4800000 {
++         no-map;
++         reg = <0x4800000 0x1800000>;
++      };
++   };
++
++   reserved-driver@0 {
++      compatible = "xlnx,reserved-memory";
++      memory-region = <&reserved>;
++   };
++
 +   chosen {
 +      bootargs = "";
 +      stdout-path = "serial0:115200n8";
