@@ -89,7 +89,7 @@
 +CONFIG_BOOTDELAY=3
 --- /dev/null   2022-03-25 12:10:22.099999999 +0800
 +++ b/arch/arm/dts/zynq-ebaz4205.dts 2022-03-25 22:40:07.428966895 +0800
-@@ -0,0 +1,94 @@
+@@ -0,0 +1,110 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 +*  Copyright (C) 2011 - 2015 Xilinx
