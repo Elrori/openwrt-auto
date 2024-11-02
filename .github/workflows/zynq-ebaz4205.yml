@@ -38,8 +38,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v1.2.0
-        release_name: zynq-ebaz4205-linux-4.14-openwrt-19.07.3-full-v1.2.0
+        tag_name: v1.3.0
+        release_name: zynq-ebaz4205-linux-4.14-openwrt-19.07.3-sdr-v1.3.0
         draft: false
         prerelease: false
         
